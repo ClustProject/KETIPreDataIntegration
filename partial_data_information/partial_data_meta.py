@@ -39,7 +39,6 @@ class PartialMetaData():
             partialFreqList.append(freq)
             
         frequency={}
-        print(partialFreqList)
         frequency['frequency_list']= partialFreqList
         frequency['min_frequency'] = min(partialFreqList)
         frequency['max_frequency'] = max(partialFreqList)
