@@ -1,8 +1,8 @@
 import pandas as pd 
-from KETIPreDataIntegration.partial_data_information import partial_data_meta
+import numpy as np
+
 class DataIntegration():
-    def __init__(self, data_partial, freq_check_length = 5):    
-        self.partial_dataset_info = partial_data_meta.PartialMetaData(data_partial, freq_check_length)
+    def __init__(self, data_partial):    
         self.data_partial = data_partial
         
     def simple_integration(self):
@@ -13,7 +13,8 @@ class DataIntegration():
             partial_data = self.data_partial[data_name].sort_index(axis=1)
             partial_data = partial_data.fillna("missingData")
             merged_data_list.append(partial_data)
-        merged_data = pd.concat(merged_data_list, axis=1, join='inner', sort=True)
+        #merged_data = pd.concat(merged_data_list, axis=1, join='inner', sort=True)
+        merged_data = pd.concat(merged_data_list, axis=1, join='outer', sort=True)
 
         return merged_data
         
