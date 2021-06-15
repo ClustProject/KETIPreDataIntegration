@@ -7,9 +7,10 @@ class PartialMetaData():
     def __init__(self, partial_data_set, freq_check_length = 5):
         self.freq_check_length= freq_check_length
         self.partial_data_set = partial_data_set
-        self.partial_data_frequency = self._get_partial_data_freqeuncy_list(self.freq_check_length)
-        self.partial_data_frequency_info = self._get_partial_data_frequency_info()
-        self.overapped_duration = self._get_partial_data_set_start_end()
+        self.column_meta={}
+        self.column_meta['overap_duration'] = self._get_partial_data_set_start_end()
+        self.column_meta['column_characteristics'] = self._get_partial_data_freqeuncy_list(self.freq_check_length)
+        self.partial_frequency_info = self._get_partial_data_frequency_info()
         self.integrated_data_type = self._get_partial_data_type()
     
     def _get_partial_data_freqeuncy_list(self, freq_check_length):
@@ -26,6 +27,14 @@ class PartialMetaData():
                 freq = pd.to_timedelta(freq, errors='coerce')
                 column_info['column_frequency'] = freq
                 column_info['column_type'] = data[column].dtype
+                if freq is not None:
+                    column_info['occurence_time'] = "Continuous"
+                else:
+                    column_info['occurence_timo'] = "Event"
+                column_info['pointDependency']="Yes"
+                column_info['upsampling_method']="np.mean"
+                column_info['downsampling_method']="np.mean"
+                
                 column_list.append(column_info)
         return column_list
      
@@ -58,8 +67,8 @@ class PartialMetaData():
             end = data.index[-1]
             start_list.append(start)
             end_list.append(end)
-        duration['start'] = max(start_list)
-        duration['end'] = min(end_list)
+        duration['start_time'] = max(start_list)
+        duration['end_time'] = min(end_list)
         return duration
     
     # AllNumeric, AllCategory, NumericCategory
