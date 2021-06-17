@@ -28,13 +28,10 @@ class DataIntegration():
             column_info = column_characteristics[column_name]
             origin_frequency = column_info['column_frequency']
             if origin_frequency <= re_frequency: #down_sampling
-                print("down or equal")
                 sampling_method = column_info['downsampling_method']
             if origin_frequency > re_frequency: #upsampling
-                print("up")
                 sampling_method = column_info['upsampling_method']
             column_function[column_name]  = sampling_method
-        print(column_function)
 
         if (partial_data_type == 'AllNumeric'):
             print('All column data are numeric')
@@ -55,12 +52,10 @@ class DataIntegration():
             fillna_function = column_info['fillna_function']
             limit_num = column_info['fillna_limit']
             if origin_frequency > re_frequency: #upsampling
-                print("up")
                 reStructuredData[column_name] = self._fillna_for_upsampling(reStructuredData[column_name], fillna_function, limit_num)
             else:
                 fillna_function='none'
             column_function[column_name]  = fillna_function
-        print(column_function)  
         return reStructuredData 
 
     def _fillna_for_upsampling(self, data, fillna_function, limit_num):
