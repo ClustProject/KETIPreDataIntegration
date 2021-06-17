@@ -16,26 +16,37 @@ class PartialMetaData():
     def _get_partial_data_freqeuncy_list(self, freq_check_length):
     
         data_length = len(self.partial_data_set)
-        column_list=[]
+        column_list={}
         for i in range(data_length):
             data = self.partial_data_set[i]
             columns = data.columns
             for column in columns:
                 column_info = {"column_name":'', "column_frequency":'', "column_type":''}
-                column_info['column_name'] = column
                 freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
                 freq = pd.to_timedelta(freq, errors='coerce')
                 column_info['column_frequency'] = freq
-                column_info['column_type'] = data[column].dtype
                 if freq is not None:
                     column_info['occurence_time'] = "Continuous"
                 else:
-                    column_info['occurence_timo'] = "Event"
-                column_info['pointDependency']="Yes"
-                column_info['upsampling_method']="np.mean"
-                column_info['downsampling_method']="np.mean"
-                
-                column_list.append(column_info)
+                    column_info['occurence_time'] = "Event" 
+                column_info['pointDependency']="Yes" #default
+
+                column_type = data[column].dtype
+                column_info['column_type'] = column_type
+
+                print(column_type)
+                if column_type == np.dtype('O') :
+                    column_info['upsampling_method']= 'ffill' #default
+                    column_info['downsampling_method']='ffill' #default
+                    column_info['fillna_function']= 'bfill' #default
+                else:
+                    column_info['upsampling_method']=np.mean #default
+                    column_info['downsampling_method']=np.mean #default
+                    column_info['fillna_function']= 'interpolate' #default
+
+                column_info['fillna_limit'] = 3 #default
+                column_list[column] = column_info
+
         return column_list
      
     def _get_partial_data_frequency_info(self):
