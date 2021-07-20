@@ -1,6 +1,23 @@
 import pandas as pd 
 import numpy as np
 
+def partial_data_integration(re_frequency, partial_data_set, partial_data_info):
+    data_int = DataIntegration(partial_data_set)
+    integrated_data = data_int.simple_integration(partial_data_info.column_meta['overap_duration'])
+    
+    #integrated_data_resample = data_int.restructured_data_with_new_frequency(integrated_data, partial_data_info.partial_frequency_info['max_frequency'], partial_data_info.column_meta['column_characteristics'])
+    partial_data_type = partial_data_info.integrated_data_type
+    column_characteristics = partial_data_info.column_meta['column_characteristics']
+    
+    """
+    for columncharacteristicstic in column_characteristics:
+        print(column_characteristics[columncharacteristicstic])
+        pass
+    #column_characteristics['data0']['upsampling_method']=np.interp
+    """
+    integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics, partial_data_type)
+    integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
+    return integrated_data_resample_fillna
 
 class DataIntegration():
     def __init__(self, data_partial):    
