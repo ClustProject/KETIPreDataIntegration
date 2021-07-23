@@ -1,13 +1,15 @@
 import pandas as pd 
 import numpy as np
 
-def partial_data_integration(re_frequency, partial_data_set, partial_data_info):
+def temp(x):
+    return lambda x: x.max() - x.min()
+    
+def partial_data_integration(re_frequency, partial_data_set, column_meta):
     data_int = DataIntegration(partial_data_set)
-    integrated_data = data_int.simple_integration(partial_data_info.column_meta['overap_duration'])
+    integrated_data = data_int.simple_integration(column_meta['overap_duration'])
     
     #integrated_data_resample = data_int.restructured_data_with_new_frequency(integrated_data, partial_data_info.partial_frequency_info['max_frequency'], partial_data_info.column_meta['column_characteristics'])
-    partial_data_type = partial_data_info.integrated_data_type
-    column_characteristics = partial_data_info.column_meta['column_characteristics']
+    column_characteristics = column_meta['column_characteristics']
     
     """
     for columncharacteristicstic in column_characteristics:
@@ -15,7 +17,7 @@ def partial_data_integration(re_frequency, partial_data_set, partial_data_info):
         pass
     #column_characteristics['data0']['upsampling_method']=np.interp
     """
-    integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics, partial_data_type)
+    integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
     integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
     return integrated_data_resample_fillna
 
@@ -38,27 +40,32 @@ class DataIntegration():
         self.merged_data = merged_data 
         return self.merged_data
     
-    def restructured_data_with_new_frequency(self, re_frequency, column_characteristics, partial_data_type):
+        
+    def restructured_data_with_new_frequency(self, re_frequency, column_characteristics):
         column_function={}
         for column_name in column_characteristics:
             #reStructuredData = data.resample(frequency).apply(np.mean)
             column_info = column_characteristics[column_name]
             origin_frequency = column_info['column_frequency']
             if origin_frequency <= re_frequency: #down_sampling
-                sampling_method = column_info['downsampling_method']
+                sampling_method_string = column_info['downsampling_method']
             if origin_frequency > re_frequency: #upsampling
-                sampling_method = column_info['upsampling_method']
-            column_function[column_name]  = sampling_method
-
-        if (partial_data_type == 'AllNumeric'):
-            print('All column data are numeric')
-            
-        else:
-            print('Having Category or string data')
-        
+                sampling_method_string = column_info['upsampling_method']
+            #sampling_method = self.converting_sampling_method(sampling_method_string)
+            sampling_method = sampling_method_string
+            column_function[column_name]  = (lambda x: x.mean()/x.std)
+        print(column_function)
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)     
         return reStructuredData 
 
+    def converting_sampling_method(self, sampling_method_string):
+        if sampling_method_string =='mean':
+            sampling_method = np.mean
+        elif sampling_method_string =='median':
+            sampling_method = np.median()
+        #elif sampling_method_string == ''
+        return sampling_method
+        
     def restructured_data_fillna(self, origin_data, column_characteristics,re_frequency):
         column_function={}
         reStructuredData = origin_data.copy()
