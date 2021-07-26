@@ -74,7 +74,8 @@ class DataIntegration():
         return sampling_method
         
     def restructured_data_fillna(self, origin_data, column_characteristics,re_frequency):
-        column_function={}
+        column_function={} 
+        
         reStructuredData = origin_data.copy()
         for column_name in column_characteristics:
             #reStructuredData = data.resample(frequency).apply(np.mean)
