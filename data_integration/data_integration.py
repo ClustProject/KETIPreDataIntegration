@@ -17,8 +17,11 @@ def partial_data_integration(re_frequency, partial_data_set, column_meta):
         pass
     #column_characteristics['data0']['upsampling_method']=np.interp
     """
+    print(integrated_data[:3])
     integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
+    print(integrated_data_resample[:3])
     integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
+    print(integrated_data_resample_fillna[:3])
     return integrated_data_resample_fillna
 
 class DataIntegration():
@@ -51,9 +54,9 @@ class DataIntegration():
                 sampling_method_string = column_info['downsampling_method']
             if origin_frequency > re_frequency: #upsampling
                 sampling_method_string = column_info['upsampling_method']
-            #sampling_method = self.converting_sampling_method(sampling_method_string)
-            sampling_method = sampling_method_string
-            column_function[column_name]  = (lambda x: x.mean()/x.std)
+            sampling_method = self.converting_sampling_method(sampling_method_string)
+            column_function[column_name] = sampling_method
+            #sampling_method = sampling_method_string
         print(column_function)
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)     
         return reStructuredData 
@@ -62,7 +65,11 @@ class DataIntegration():
         if sampling_method_string =='mean':
             sampling_method = np.mean
         elif sampling_method_string =='median':
-            sampling_method = np.median()
+            sampling_method = np.median
+        elif sampling_method_string == 'ffill':
+            sampling_method="ffill"
+        elif sampling_method_string =='bfill':
+            sampling_method = 'bfill'
         #elif sampling_method_string == ''
         return sampling_method
         
