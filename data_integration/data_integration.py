@@ -17,11 +17,8 @@ def partial_data_integration(re_frequency, partial_data_set, column_meta):
         pass
     #column_characteristics['data0']['upsampling_method']=np.interp
     """
-    print(integrated_data[:3])
     integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
-    print(integrated_data_resample[:3])
     integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
-    print(integrated_data_resample_fillna[:3])
     return integrated_data_resample_fillna
 
 class DataIntegration():
@@ -57,7 +54,7 @@ class DataIntegration():
             sampling_method = self.converting_sampling_method(sampling_method_string)
             column_function[column_name] = sampling_method
             #sampling_method = sampling_method_string
-        print(column_function)
+
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)     
         return reStructuredData 
 
