@@ -1,6 +1,17 @@
 import pandas as pd 
 import numpy as np
 
+def get_integrated_dataset(data_set, re_frequency_min=4):
+    from KETIToolDataExploration.partial_meta_data import partial_data_meta
+    partial_data_info = partial_data_meta.PartialMetaData(data_set)
+    # Integration
+    import datetime
+    re_frequency = datetime.timedelta(seconds= re_frequency_min*60)
+    from KETIPreDataIntegration.data_integration import data_integration
+    integrated_data_resample = data_integration.partial_data_integration(re_frequency, data_set, partial_data_info.column_meta)
+    
+    return integrated_data_resample 
+    
 def temp(x):
     return lambda x: x.max() - x.min()
     
