@@ -8,7 +8,7 @@ def clustIntegration(intDataInfo, process_param, re_frequency):
     multiple_dataset  = db_client.get_MeasurementDataSet(intDataInfo)
     ## Preprocessing
     from KETIPrePartialDataPreprocessing import data_preprocessing
-    multiple_dataset = data_preprocessing.get_preprocessed_Multipledataset(multiple_dataset, process_param)
+    multiple_dataset = data_preprocessing.MultipleDatasetByAllMethod(multiple_dataset, process_param)
     ## Integration
     from KETIPreDataIntegration.data_integration import data_integration
     imputed_datas = []
