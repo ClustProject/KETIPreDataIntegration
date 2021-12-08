@@ -24,7 +24,7 @@ if __name__ == "__main__":
     imputation_param = {
         "serialImputation":{
             "flag":True,
-            "imputation_method":[{"min":0,"max":50,"method":"linear"}],
+            "imputation_method":[{"min":0,"max":50,"method":"linear", "parameter":{}}],
             "totalNanLimit":70
         }
     }
