@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     refine_param = {
         "removeDuplication":{"flag":True},
-        "staticFrequency":{"flag":True}
+        "staticFrequency":{"flag":True, "frequency":None}
     }
     outlier_param  = {
         "certainOutlierToNaN":{"flag":True},
