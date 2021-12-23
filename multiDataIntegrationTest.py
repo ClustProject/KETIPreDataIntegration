@@ -25,7 +25,7 @@ if __name__ == "__main__":
         "serialImputation":{
             "flag":True,
             "imputation_method":[{"min":0,"max":50,"method":"linear", "parameter":{}}],
-            "totalNanLimit":70
+            "totalNonNanRatio":80
         }
     }
     process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
