@@ -3,7 +3,7 @@ def clustIntegration(intDataInfo, process_param, re_frequency):
     ## Connect DB
     from KETIPreDataIngestion.KETI_setting import influx_setting_KETI as ins
     from KETIPreDataIngestion.data_influx import influx_Client
-    db_client = influx_Client.influxClient(ins)
+    db_client = influx_Client.influxClient(ins.CLUSTDataServer)
     ## multiple dataset
     multiple_dataset  = db_client.get_MeasurementDataSet(intDataInfo)
     ## Preprocessing
