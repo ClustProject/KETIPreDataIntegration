@@ -16,5 +16,18 @@ def clustIntegration(intDataInfo, process_param, re_frequency):
     imputed_datas = {}
     for key in multiple_dataset.keys():
         imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
-    result = data_integration.get_integrated_dataset(imputed_datas, re_frequency)
+    result = get_integrated_dataset(imputed_datas, re_frequency)
     return result
+
+
+
+def get_integrated_dataset(data_set, re_frequency_min):
+    from KETIPreDataIntegration.meta_integration import partialDataInfo
+    partial_data_info = partialDataInfo.PartialData(data_set)
+    # Integration
+    import datetime
+    re_frequency = datetime.timedelta(seconds= re_frequency_min*60)
+    from KETIPreDataIntegration.data_integration import data_integration
+    integrated_data_resample = data_integration.dataIntegrationByMeta(re_frequency, data_set, partial_data_info.column_meta)
+    
+    return integrated_data_resample 

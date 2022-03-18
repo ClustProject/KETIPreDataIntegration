@@ -1,43 +1,52 @@
 import pandas as pd 
 import numpy as np
 
-def get_integrated_dataset(data_set, re_frequency_min=4):
-    from KETIToolDataExploration.partial_meta_data import partial_data_meta
-    partial_data_info = partial_data_meta.PartialMetaData(data_set)
-    # Integration
-    import datetime
-    re_frequency = datetime.timedelta(seconds= re_frequency_min*60)
-    from KETIPreDataIntegration.data_integration import data_integration
-    integrated_data_resample = data_integration.partial_data_integration(re_frequency, data_set, partial_data_info.column_meta)
-    
-    return integrated_data_resample 
-    
-def temp(x):
-    return lambda x: x.max() - x.min()
-    
-def partial_data_integration(re_frequency, partial_data_set, column_meta):
+def dataIntegrationByMeta(re_frequency, partial_data_set, column_meta):
+    """ 
+    This function integrates datasetCollection.
+
+    :param  re_frequency: metadata for integration of each dataset   
+    :type re_frequency: json
+        
+    :param  partial_data_set:    
+    :type partial_data_set: DataFrameCollection
+        
+    :param  column_characteristics: metadata for integration of each dataset   
+    :type column_characteristics: json
+             
+    :return: integrated_data_resample_fillna
+    :rtype: DataFrame    
+    """
+
     data_int = DataIntegration(partial_data_set)
-    integrated_data = data_int.simple_integration(column_meta['overap_duration'])
-    
-    #integrated_data_resample = data_int.restructured_data_with_new_frequency(integrated_data, partial_data_info.partial_frequency_info['max_frequency'], partial_data_info.column_meta['column_characteristics'])
     column_characteristics = column_meta['column_characteristics']
+    data_int.simple_integration(column_meta['overlap_duration'])
     
-    """
-    for columncharacteristicstic in column_characteristics:
-        print(column_characteristics[columncharacteristicstic])
-        pass
-    #column_characteristics['data0']['upsampling_method']=np.interp
-    """
     integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
     integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
+
     return integrated_data_resample_fillna
 
 class DataIntegration():
+    """
+    Data Integration Class
+    """
     def __init__(self, data_partial):    
         self.data_partial = data_partial
 
         
     def simple_integration(self, duration):
+        """ This function integrates datasetCollection without no pre-post processing.
+        
+        :param  duration:   example) {'start_time': Timestamp('2018-01-01 00:00:00'), 'end_time': Timestamp('2018-01-01 23:55:00')}
+        :type duration: dictionary types 
+        
+        :return: merged_data
+        :rtype: DataFrame
+        >>> from KETIPreDataIntegration.data_integration import data_integration
+        >>> data_int = data_integration.DataIntegration(data_partial_numeric)
+        >>> integrated_data = data_int.simple_integration(partial_data_info.column_meta['overlap_duration'])
+        """
         data_key_list = list(self.data_partial.keys())
         merged_data_list =[]
         for data_name in data_key_list:
@@ -53,6 +62,56 @@ class DataIntegration():
     
         
     def restructured_data_with_new_frequency(self, re_frequency, column_characteristics):
+        """ This function integrates datasetCollection with new data frequency
+        
+        :param  re_frequncy: description frequency for new integrated data   
+        :type re_frequncy: timedelta 
+
+        :param  column_characteristics: metadata for integration of each dataset   
+        :type column_characteristics: json
+        >>> column_characteristics = {
+                    "data0": {
+                        "column_name": "data0",
+                        "column_frequency": Timedelta("0 days 00:10:00"),
+                        "column_type": dtype("int64"),
+                        "occurence_time": "Continuous",
+                        "pointDependency": "Yes",
+                        "upsampling_method": "mean",
+                        "downsampling_method": "mean",
+                        "fillna_function": "interpolate",
+                        "fillna_limit": 31,
+                    },
+                    "data1": {
+                        "column_name": "data1",
+                        "column_frequency": Timedelta("0 days 00:07:00"),
+                        "column_type": dtype("int64"),
+                        "occurence_time": "Continuous",
+                        "pointDependency": "Yes",
+                        "upsampling_method": "mean",
+                        "downsampling_method": "mean",
+                        "fillna_function": "interpolate",
+                        "fillna_limit": 31,
+                    },
+                    "data2": {
+                        "column_name": "data2",
+                        "column_frequency": Timedelta("0 days 00:03:00"),
+                        "column_type": dtype("int64"),
+                        "occurence_time": "Continuous",
+                        "pointDependency": "Yes",
+                        "upsampling_method": "mean",
+                        "downsampling_method": "mean",
+                        "fillna_function": "interpolate",
+                        "fillna_limit": 31,
+                    },
+            }
+        :return: merged_data
+        :rtype: DataFrame
+        >>> from KETIPreDataIntegration.data_integration import data_integration
+        >>> data_int = data_integration.DataIntegration(dataset)
+        >>> re_frequency = datetime.timedelta(seconds=180)
+        >>> integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
+        """
+        # TODO JW 수정해서 바꿔야함. 우선 스트링 타입에 대해서 이젠 동작하지 않고 있음
         column_function={}
         for column_name in column_characteristics:
             #reStructuredData = data.resample(frequency).apply(np.mean)
@@ -65,8 +124,8 @@ class DataIntegration():
             sampling_method = self.converting_sampling_method(sampling_method_string)
             column_function[column_name] = sampling_method
             #sampling_method = sampling_method_string
-
-        reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)     
+        # To Do : Upgrade merge function 
+        reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)  
         return reStructuredData 
 
     def converting_sampling_method(self, sampling_method_string):
@@ -82,6 +141,27 @@ class DataIntegration():
         return sampling_method
         
     def restructured_data_fillna(self, origin_data, column_characteristics,re_frequency):
+        """ This function integrates datasetCollection and fill NA
+        
+        :param  origin_data: integrated with resampling NaN   
+        :type origin_data: DataFrame
+
+        :param  column_characteristics: metadata for integration of each dataset   
+        :type column_characteristics: json
+        
+        :param  re_frequency: metadata for integration of each dataset   
+        :type re_frequency: json
+                       
+        :return: reconstructedData
+        :rtype: DataFrame
+
+        >>> from KETIPreDataIntegration.data_integration import data_integration
+        >>> data_int = data_integration.DataIntegration(dataset)
+        >>> re_frequency = datetime.timedelta(seconds=180)
+        >>> integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
+        >>> integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency, fillna_num )
+        """
+
         column_function={} 
         
         reStructuredData = origin_data.copy()
@@ -89,20 +169,17 @@ class DataIntegration():
             #reStructuredData = data.resample(frequency).apply(np.mean)
             column_info = column_characteristics[column_name]
             origin_frequency = column_info['column_frequency']
-            fillna_function = column_info['fillna_function']
-            limit_num = column_info['fillna_limit']
+            import math 
+            limit_num = math.ceil(origin_frequency/re_frequency)
+
             if origin_frequency > re_frequency: #upsampling
-                reStructuredData[column_name] = self._fillna_for_upsampling(reStructuredData[column_name], fillna_function, limit_num)
-            else:
-                fillna_function='none'
-            column_function[column_name]  = fillna_function
+                import numpy as np
+                if column_info['column_type'] == np.dtype('O'):
+                   reStructuredData[column_name] = reStructuredData[column_name].fillna(method ="ffill", limit = limit_num) 
+                else:
+                    reStructuredData[column_name] = reStructuredData[column_name].interpolate(limit = limit_num) 
+
         return reStructuredData 
+    
 
-    def _fillna_for_upsampling(self, data, fillna_function, limit_num):
-
-        if fillna_function =='interpolate':
-            filled_data = data.interpolate(limit=limit_num)
-        else:
-            filled_data = data.fillna(method=fillna_function, limit=limit_num)
-        return filled_data
 
