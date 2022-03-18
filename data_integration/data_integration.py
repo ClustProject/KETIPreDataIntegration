@@ -1,32 +1,5 @@
 import pandas as pd 
 import numpy as np
-
-def dataIntegrationByMeta(re_frequency, partial_data_set, column_meta):
-    """ 
-    This function integrates datasetCollection.
-
-    :param  re_frequency: metadata for integration of each dataset   
-    :type re_frequency: json
-        
-    :param  partial_data_set:    
-    :type partial_data_set: DataFrameCollection
-        
-    :param  column_characteristics: metadata for integration of each dataset   
-    :type column_characteristics: json
-             
-    :return: integrated_data_resample_fillna
-    :rtype: DataFrame    
-    """
-
-    data_int = DataIntegration(partial_data_set)
-    column_characteristics = column_meta['column_characteristics']
-    data_int.simple_integration(column_meta['overlap_duration'])
-    
-    integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
-    integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
-
-    return integrated_data_resample_fillna
-
 class DataIntegration():
     """
     Data Integration Class
@@ -34,7 +7,29 @@ class DataIntegration():
     def __init__(self, data_partial):    
         self.data_partial = data_partial
 
+    def dataIntegrationByMeta(self, re_frequency, column_meta):
+        """ 
+        1. simple data integration
+        2. restructure data with new frequency
+        3. fill NA resulting from integration
+
+        :param  re_frequency: metadata for integration of each dataset   
+        :type re_frequency: json
+            
+        :param  column_characteristics: metadata for integration of each dataset   
+        :type column_characteristics: json
+                
+        :return: integrated_data_resample_fillna
+        :rtype: DataFrame    
+        """
+        column_characteristics = column_meta['column_characteristics']
+        self.simple_integration(column_meta['overlap_duration'])
         
+        integrated_data_resample = self.restructured_data_with_new_frequency(re_frequency, column_characteristics)
+        integrated_data_resample_fillna = self.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency )
+
+        return integrated_data_resample_fillna
+
     def simple_integration(self, duration):
         """ This function integrates datasetCollection without no pre-post processing.
         
