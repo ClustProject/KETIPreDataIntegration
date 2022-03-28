@@ -21,7 +21,7 @@ class ClustIntegration():
         partialP = data_preprocessing.packagedPartialProcessing(process_param)
         multiple_dataset = partialP.MultipleDatasetallPartialProcessing(multiple_dataset)
         ## Integration
-        from KETIPreDataIntegration.data_integration import data_integration
+        from KETIPreDataIntegration.meta_integration import data_integration
         imputed_datas = {}
         for key in multiple_dataset.keys():
             imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
@@ -35,16 +35,17 @@ class ClustIntegration():
         return result
 
     def getIntegratedDataSetByML(self, data_set, integration_freq_min):
+        from KETIPreDataIntegration.ml_integration import xxx
         # 필요시 모 함수에서 받아오는 파라미터가 수정 및 확장되어야함 황지수씨 시작점
         pass
 
     def getIntegratedDataSetByMeta(self, data_set, integration_freq_min):
-        from KETIPreDataIntegration.data_integration import partialDataInfo
+        from KETIPreDataIntegration.meta_integration import partialDataInfo
         partial_data_info = partialDataInfo.PartialData(data_set)
         # Integration
         import datetime
         re_frequency = datetime.timedelta(seconds= integration_freq_min*60)
-        from KETIPreDataIntegration.data_integration import data_integration
+        from KETIPreDataIntegration.meta_integration import data_integration
         data_it = data_integration.DataIntegration(data_set)
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
         
