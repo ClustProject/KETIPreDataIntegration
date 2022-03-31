@@ -4,7 +4,7 @@ sys.path.append("../")
 sys.path.append("../..")
 import pandas as pd
 import numpy as np
-from KETIToolDataExploration.util import df_time_util
+from pandas.tseries.frequencies import to_offset
 
 class PartialData():
     def __init__(self, partial_data_set):
@@ -80,7 +80,7 @@ class PartialData():
             for column in columns:
                 column_info = {"column_name":'', "column_frequency":'', "column_type":''}
                 column_info['column_name'] = column
-                freq = df_time_util.get_df_freq_timedelta(data, freq_check_length)
+                freq = self.get_df_freq_timedelta(data, freq_check_length)
                 column_info['column_frequency'] = freq
                 if freq is not None:
                     column_info['occurence_time'] = "Continuous"
@@ -108,7 +108,7 @@ class PartialData():
         partialFreqList=[]
         data_length = len(self.partial_data_set)
         for i in range(data_length):
-            freq = df_time_util.get_df_freq_sec(self.partial_data_set[i], self.freq_check_length)
+            freq = self.get_df_freq_sec(self.partial_data_set[i], self.freq_check_length)
             partialFreqList.append(freq)
             
         frequency={}
@@ -159,5 +159,17 @@ class PartialData():
     
     def _check_same_freq(self, item_list):
         return(len(set(item_list))) < 2
+
+    def get_df_freq_sec(self, data, freq_check_length):
+
+        freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
+        freq_sec = pd.to_timedelta(freq, errors='coerce').total_seconds()
+        return freq_sec
+
+    def get_df_freq_timedelta(self, data, freq_check_length):
+        freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
+        freq_timedelta = pd.to_timedelta(freq, errors='coerce')
+        return freq_timedelta
+
         
     
