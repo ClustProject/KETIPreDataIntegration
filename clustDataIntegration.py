@@ -8,7 +8,7 @@ class ClustIntegration():
     def __init__(self):
         pass
 
-    def clustIntegrationFromInfluxSource(self, intDataInfo, process_param, integration_freq_min, integrationMethod):
+    def clustIntegrationFromInfluxSource(self, intDataInfo, process_param, integration_param):
         ## Connect DB
         from KETIPreDataIngestion.KETI_setting import influx_setting_KETI as ins
         from KETIPreDataIngestion.data_influx import influx_Client
@@ -23,18 +23,19 @@ class ClustIntegration():
         ## Integration
         from KETIPreDataIntegration.meta_integration import data_integration
         imputed_datas = {}
+        integrationMethod = integration_param['method']
         for key in multiple_dataset.keys():
             imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
         if integrationMethod=="meta":
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_min)
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
         elif integrationMethod=="ML":
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_freq_min)
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_min'], integration_param['param'] )
         else:
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_min)
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
 
         return result
 
-    def getIntegratedDataSetByML(self, data_set, integration_freq_min):
+    def getIntegratedDataSetByML(self, data_set, integration_freq_min, param):
         from KETIPreDataIntegration.ml_integration import xxx
         # 필요시 모 함수에서 받아오는 파라미터가 수정 및 확장되어야함 황지수씨 시작점
         pass
