@@ -57,12 +57,8 @@ class PartialData():
             }
             partial_data_info.partial_frequency_info = {'frequency_list': [600.0, 420.0, 180.0], 'min_frequency': 180.0, 'max_frequency': 600.0, 'frequency_is_same': False, 'average_frequency': 400.0, 'median_frequency': 420.0}
             partial_data_info.integrated_data_type = AllNumeric
-
-
-        
         """
-        freq_check_length = 5
-        self.freq_check_length= freq_check_length
+        self.freq_check_length= 5
         self.partial_data_set = partial_data_set
         self.column_meta={}
         self.column_meta['overlap_duration'] = self._get_partial_data_set_start_end()
@@ -118,6 +114,15 @@ class PartialData():
         frequency['frequency_is_same'] = self._check_same_freq(partialFreqList)
         frequency['average_frequency'] = np.mean(partialFreqList)
         frequency['median_frequency'] = np.median(partialFreqList)
+        from fractions import gcd
+        from functools import reduce
+        def find_gcd(list):
+            x = reduce(gcd, list)
+            return x
+
+        frequency['GCD'] = find_gcd(frequency['frequency_list']) #Greatest common divisor
+        frequency['GCDs'] = str(int(frequency['GCD']))+'S'
+
         return frequency
     
     def _get_partial_data_set_start_end(self):
