@@ -55,7 +55,14 @@ class PartialData():
                     },
                 },
             }
-            partial_data_info.partial_frequency_info = {'frequency_list': [600.0, 420.0, 180.0], 'min_frequency': 180.0, 'max_frequency': 600.0, 'frequency_is_same': False, 'average_frequency': 400.0, 'median_frequency': 420.0}
+            partial_data_info.partial_frequency_info = {'frequency_list': [600.0, 420.0, 180.0],
+                'min_frequency': 180.0,
+                'max_frequency': 600.0,
+                'frequency_is_same': False,
+                'average_frequency': 400.0,
+                'median_frequency': 420.0,
+                'GCD': 60.0,
+                'GCDs': '60S'}
             partial_data_info.integrated_data_type = AllNumeric
         """
         self.freq_check_length= 5
