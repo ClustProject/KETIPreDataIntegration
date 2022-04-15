@@ -121,13 +121,13 @@ class PartialData():
         frequency['frequency_is_same'] = self._check_same_freq(partialFreqList)
         frequency['average_frequency'] = np.mean(partialFreqList)
         frequency['median_frequency'] = np.median(partialFreqList)
-        from fractions import gcd
+        from math import gcd
         from functools import reduce
         def find_gcd(list):
             x = reduce(gcd, list)
             return x
 
-        frequency['GCD'] = find_gcd(frequency['frequency_list']) #Greatest common divisor
+        frequency['GCD'] = find_gcd(int(frequency['frequency_list'])) #Greatest common divisor
         frequency['GCDs'] = str(int(frequency['GCD']))+'S'
 
         return frequency
