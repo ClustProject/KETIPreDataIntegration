@@ -112,7 +112,7 @@ class PartialData():
         data_length = len(self.partial_data_set)
         for i in range(data_length):
             freq = self.get_df_freq_sec(self.partial_data_set[i], self.freq_check_length)
-            partialFreqList.append(freq)
+            partialFreqList.append(int(freq))
             
         frequency={}
         frequency['frequency_list']= partialFreqList
@@ -126,8 +126,9 @@ class PartialData():
         def find_gcd(list):
             x = reduce(gcd, list)
             return x
-
-        frequency['GCD'] = find_gcd(int(frequency['frequency_list'])) #Greatest common divisor
+        frequency_list = frequency['frequency_list']
+        print(frequency_list)
+        frequency['GCD'] = find_gcd(frequency_list) #Greatest common divisor
         frequency['GCDs'] = str(int(frequency['GCD']))+'S'
 
         return frequency
