@@ -29,16 +29,23 @@ class ClustIntegration():
         if integrationMethod=="meta":
             result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
         elif integrationMethod=="ML":
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_min'], integration_param['param'] )
+            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_min'], integration_param['param'])
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'])
         else:
             result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
 
         return result
 
-    def getIntegratedDataSetByML(self, data_set, integration_freq_min, param):
-        from KETIPreDataIntegration.ml_integration import xxx
+    def getIntegratedDataSetByML(self, data_set, param):
+        from KETIPreDataIntegration.ml_integration import RNNAEAlignment
         # 필요시 모 함수에서 받아오는 파라미터가 수정 및 확장되어야함 황지수씨 시작점
-        pass
+        model = param["model"]
+        if model == "RNN_AE":
+            alignment_result = RNNAEAlignment.Alignment().RNN_AE(data_set, param['parameter'])
+        else :
+            print('Not Available')
+            
+        return alignment_result
 
     def getIntegratedDataSetByMeta(self, data_set, integration_freq_min):
         from KETIPreDataIntegration.meta_integration import partialDataInfo
