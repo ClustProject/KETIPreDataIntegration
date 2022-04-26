@@ -51,10 +51,11 @@ class ClustIntegration():
         from KETIPreDataIntegration.meta_integration import partialDataInfo
         partial_data_info = partialDataInfo.PartialData(data_set)
         # Integration
-        import datetime
-        re_frequency = datetime.timedelta(seconds= integration_freq_min*60)
         from KETIPreDataIntegration.meta_integration import data_integration
         data_it = data_integration.DataIntegration(data_set)
+        
+        import datetime
+        re_frequency = datetime.timedelta(seconds= integration_freq_min*60)
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
         
         return integrated_data_resample 
