@@ -27,12 +27,12 @@ class ClustIntegration():
         for key in multiple_dataset.keys():
             imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
         if integrationMethod=="meta":
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_second'])
         elif integrationMethod=="ML":
-            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_min'], integration_param['param'])
+            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_second'], integration_param['param'])
             result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'])
         else:
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_min'])
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_second'])
 
         return result
 
@@ -47,7 +47,7 @@ class ClustIntegration():
             
         return alignment_result
 
-    def getIntegratedDataSetByMeta(self, data_set, integration_freq_min):
+    def getIntegratedDataSetByMeta(self, data_set, integration_freq_second):
         from KETIPreDataIntegration.meta_integration import partialDataInfo
         partial_data_info = partialDataInfo.PartialData(data_set)
         # Integration
@@ -55,7 +55,7 @@ class ClustIntegration():
         data_it = data_integration.DataIntegration(data_set)
         
         import datetime
-        re_frequency = datetime.timedelta(seconds= integration_freq_min*60)
+        re_frequency = datetime.timedelta(seconds= integration_freq_second)
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
         
         return integrated_data_resample 
