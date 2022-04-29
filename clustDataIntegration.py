@@ -27,12 +27,12 @@ class ClustIntegration():
         for key in multiple_dataset.keys():
             imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
         if integrationMethod=="meta":
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_second'])
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_sec'])
         elif integrationMethod=="ML":
-            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_second'], integration_param['param'])
+            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_sec'], integration_param['param'])
             result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'])
         else:
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_second'])
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_sec'])
 
         return result
 
