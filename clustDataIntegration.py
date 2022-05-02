@@ -1,3 +1,4 @@
+from functools import partial
 import sys
 sys.path.append("../")
 sys.path.append("../..")
@@ -18,8 +19,10 @@ class ClustIntegration():
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
         partial_data_info = partialDataInfo.PartialData(multiple_dataset)
+        overlap_duration = partial_data_info.column_meta["overlap_duration"]
+        integration_freq_second = integration_param["granularity_sec"]
         ## set refine frequency parameter
-        if not integration_param['granularity_second']:
+        if not integration_freq_second:
             process_param["refine_param"]["staticFrequency"]["frequency"] = partial_data_info.partial_frequency_info['GCDs']
         ## Preprocessing
         from KETIPrePartialDataPreprocessing import data_preprocessing
@@ -33,26 +36,26 @@ class ClustIntegration():
         for key in multiple_dataset.keys():
             imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
         if integrationMethod=="meta":
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_sec'], partial_data_info)
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_second, partial_data_info)
         elif integrationMethod=="ML":
-            #result = self.getIntegratedDataSetByML(imputed_datas, integration_param['granularity_sec'], integration_param['param'])
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'], partial_data_info)
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
         else:
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_param['granularity_sec'], partial_data_info)
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_second, partial_data_info)
 
         return result
 
-    def getIntegratedDataSetByML(self, data_set, param, partial_data_info):
+    def getIntegratedDataSetByML(self, data_set, transform_param, overlap_duration):
         from KETIPreDataIntegration.ml_integration import RNNAEAlignment
         from KETIPreDataIntegration.meta_integration import data_integration
         
         ## simple integration
         data_int = data_integration.DataIntegration(data_set)
-        dintegrated_data = data_int.simple_integration(partial_data_info.column_meta["overlap_duration"])
+        dintegrated_data = data_int.simple_integration(overlap_duration)
         
-        model = param["model"]
+        model = transform_param["model"]
+        transfomrParam = transform_param['model_parameter']
         if model == "RNN_AE":
-            alignment_result = RNNAEAlignment.Alignment().RNN_AE(dintegrated_data, param['model_parameter'])
+            alignment_result = RNNAEAlignment.Alignment().RNN_AE(dintegrated_data, transfomrParam)
         else :
             print('Not Available')
             
