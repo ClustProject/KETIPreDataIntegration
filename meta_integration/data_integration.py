@@ -6,6 +6,7 @@ class DataIntegration():
     """
     def __init__(self, data_partial):    
         self.data_partial = data_partial
+        
 
     def dataIntegrationByMeta(self, re_frequency, column_meta):
         """ 
@@ -118,21 +119,38 @@ class DataIntegration():
                 sampling_method_string = column_info['upsampling_method']
             sampling_method = self.converting_sampling_method(sampling_method_string)
             column_function[column_name] = sampling_method
-            #sampling_method = sampling_method_string
+
         # To Do : Upgrade merge function 
+        print(column_function)
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)  
         return reStructuredData 
 
     def converting_sampling_method(self, sampling_method_string):
+        def objectDownFunc(x):
+            from collections import Counter
+            c = Counter(x)
+            mostFrequent = c.most_common(1)
+            return mostFrequent[0][0]
+
+        def objectUpFunc(x): # TODO Modify
+            from collections import Counter
+            c = Counter(x)
+            mostFrequent = c.most_common(1)
+            if 0< len(mostFrequent):
+                result = mostFrequent[0][0]
+            else:
+                result =np.NaN
+            return result
+
         if sampling_method_string =='mean':
             sampling_method = np.mean
         elif sampling_method_string =='median':
             sampling_method = np.median
-        elif sampling_method_string == 'ffill':
-            sampling_method="ffill"
-        elif sampling_method_string =='bfill':
-            sampling_method = 'bfill'
-        #elif sampling_method_string == ''
+        elif sampling_method_string == 'objectDownFunc':
+            sampling_method=objectDownFunc
+        elif sampling_method_string =='objectUpFunc':
+            sampling_method = objectUpFunc
+
         return sampling_method
         
     def restructured_data_fillna(self, origin_data, column_characteristics,re_frequency):

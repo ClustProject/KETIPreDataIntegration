@@ -96,14 +96,13 @@ class PartialData():
                 
                 if column_type == np.dtype('O') :
                     print("ObjectType")
-                    column_info['upsampling_method']= 'ffill' #default
-                    column_info['downsampling_method']='ffill' #default
+                    column_info['upsampling_method']= "objectUpFunc" 
+                    column_info['downsampling_method']= "objectDownFunc"
                 else:
                     print("IntType")
                     column_info['upsampling_method']="mean" #default
                     column_info['downsampling_method']="mean" #default
                 column_list[column] = column_info
-
         return column_list
      
     def _get_partial_data_frequency_info(self):
@@ -176,12 +175,19 @@ class PartialData():
     def get_df_freq_sec(self, data, freq_check_length):
 
         freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
-        freq_sec = pd.to_timedelta(freq, errors='coerce').total_seconds()
+        if not freq:
+            freq_sec = (data.index[1] - data.index[0]).total_seconds()
+        else:
+            freq_sec = pd.to_timedelta(freq, errors='coerce').total_seconds()
+        print(freq_sec)
         return freq_sec
 
     def get_df_freq_timedelta(self, data, freq_check_length):
         freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
-        freq_timedelta = pd.to_timedelta(freq, errors='coerce')
+        if not freq:
+            freq_timedelta= pd.to_timedelta(data.index[1] - data.index[0])
+        else:
+            freq_timedelta = pd.to_timedelta(freq, errors='coerce')
         return freq_timedelta
 
         

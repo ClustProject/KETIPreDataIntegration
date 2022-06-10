@@ -2,7 +2,7 @@ from functools import partial
 import sys
 sys.path.append("../")
 sys.path.append("../..")
-
+import datetime
 # CLUST Project based custom function
 
 class ClustIntegration():
@@ -12,7 +12,7 @@ class ClustIntegration():
     def __init__(self):
         pass
 
-    def clustIntegrationFromInfluxSource(self, intDataInfo, process_param, integration_param):
+    def clustIntegrationFromInfluxSource(self, db_client, intDataInfo, process_param, integration_param):
         """ 
         사용자가 입력한 Parameter에 따라 데이터를 병합하는 함수
         1. intDataInfo 에 따라 InfluxDB로 부터 데이터를 읽어와 DataSet을 생성
@@ -85,14 +85,14 @@ class ClustIntegration():
         :return: integrated_data
         :rtype: DataFrame    
         """
-        ## Connect DB
-        from KETIPreDataIngestion.KETI_setting import influx_setting_KETI as ins
-        from KETIPreDataIngestion.data_influx import influx_Client
-        db_client = influx_Client.influxClient(ins.CLUSTDataServer)
         ## multiple dataset
-        multiple_dataset  = db_client.get_MeasurementDataSet(intDataInfo)
+        from KETIPreDataIngestion.data_influx import influx_Module
+        multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
+
+        
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
+
         partial_data_info = partialDataInfo.PartialData(multiple_dataset)
         
         overlap_duration = partial_data_info.column_meta["overlap_duration"]
@@ -116,9 +116,9 @@ class ClustIntegration():
         elif integrationMethod=="ML":
             result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
         elif integrationMethod=="simple":
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
+            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
         else:
-            result = self.IntegratedDataSetBySimple(imputed_datas, overlap_duration)
+            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
 
         return result
 
@@ -185,9 +185,10 @@ class ClustIntegration():
         """
         ## Integration
         from KETIPreDataIntegration.meta_integration import data_integration
-        data_it = data_integration.DataIntegration(data_set)
         
-        import datetime
+        data_it = data_integration.DataIntegration(data_set)
+       
+        
         re_frequency = datetime.timedelta(seconds= integration_freq_sec)
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
         
@@ -212,9 +213,10 @@ class ClustIntegration():
         ## Integration
         from KETIPreDataIntegration.meta_integration import data_integration
         ## simple integration
+        re_frequency = datetime.timedelta(seconds= integration_freq_sec)
         data_int = data_integration.DataIntegration(data_set)
         dintegrated_data = data_int.simple_integration(overlap_duration)
-        dintegrated_data = dintegrated_data.resample(integration_freq_sec).mean()
+        dintegrated_data = dintegrated_data.resample(re_frequency).mean()
         
         return dintegrated_data
 
