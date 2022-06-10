@@ -65,7 +65,7 @@ class PartialData():
                 'GCDs': '60S'}
             partial_data_info.integrated_data_type = AllNumeric
         """
-        self.freq_check_length= 5
+        self.freq_check_length= 3
         self.partial_data_set = partial_data_set
         self.column_meta={}
         self.column_meta['overlap_duration'] = self._get_partial_data_set_start_end()

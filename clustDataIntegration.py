@@ -28,7 +28,40 @@ class ClustIntegration():
         
         :param  integration_param: Integration을 위한 method, transformParam이 담긴 Parameter
         :type integration_param: json
-        >>> integration_param = {
+
+        >>> intDataInfo = { "db_info":[ 
+                {"db_name":"farm_inner_air", "measurement":"HS1", "start":start_time, "end":end_time},
+                {"db_name":"farm_outdoor_weather_clean", "measurement":"gunwi", "start":start_time, "end":end_time},
+                {"db_name":"farm_outdoor_air_clean", "measurement":"gunwi", "start":start_time, "end":end_time},
+            ]} 
+
+        >>> process_param 
+            refine_param = {
+                "removeDuplication":{"flag":True},
+                "staticFrequency":{"flag":True, "frequency":None}
+            }
+            CertainParam= {'flag': True}
+            uncertainParam= {'flag': False, "param":{
+                    "outlierDetectorConfig":[
+                            {'algorithm': 'IQR', 'percentile':99 ,'alg_parameter': {'weight':100}}    
+            ]}}
+            outlier_param ={
+                "certainErrorToNaN":CertainParam, 
+                "unCertainErrorToNaN":uncertainParam
+            }
+            imputation_param = {
+                "serialImputation":{
+                    "flag":False,
+                    "imputation_method":[{"min":0,"max":3,"method":"linear", "parameter":{}}],
+                    "totalNonNanRatio":80
+                }
+            }
+            process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
+
+        >>> integrationFreq_min= 30
+        >>> integration_freq_sec = 60 * integrationFreq_min# 분
+
+        >>> integration_param1 = {
                 "granularity_sec":"",
                 "transformParam":{
                                 "model": 'RNN_AE',
@@ -43,9 +76,7 @@ class ClustIntegration():
                             },
                 "method":"ML" #["ML", "meta", "simple]
             }
-            integrationFreq_min= 30
-            integration_freq_sec = 60 * integrationFreq_min# 분
-            integration_param = {
+        >>> integration_param2 = {
                 "granularity_sec":integration_freq_sec,
                 "param":{},
                 "method":"meta"
@@ -63,6 +94,7 @@ class ClustIntegration():
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
         partial_data_info = partialDataInfo.PartialData(multiple_dataset)
+        
         overlap_duration = partial_data_info.column_meta["overlap_duration"]
         integration_freq_sec = integration_param["granularity_sec"]
         ## set refine frequency parameter
