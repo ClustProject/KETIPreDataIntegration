@@ -41,7 +41,14 @@ class ClustIntegration():
                                     "device": 'cpu' # 학습 환경, ["cuda", "cpu"] 중 선택
                                 }
                             },
-                "method":"ML"
+                "method":"ML" #["ML", "meta", "simple]
+            }
+            integrationFreq_min= 30
+            integration_freq_sec = 60 * integrationFreq_min# 분
+            integration_param = {
+                "granularity_sec":integration_freq_sec,
+                "param":{},
+                "method":"meta"
             }
                 
         :return: integrated_data
@@ -76,8 +83,10 @@ class ClustIntegration():
             result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_sec, partial_data_info)
         elif integrationMethod=="ML":
             result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
+        elif integrationMethod=="simple":
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
         else:
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_sec, partial_data_info)
+            result = self.IntegratedDataSetBySimple(imputed_datas, overlap_duration)
 
         return result
 
@@ -151,6 +160,32 @@ class ClustIntegration():
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
         
         return integrated_data_resample 
+    
+    def IntegratedDataSetBySimple(self, data_set, integration_freq_sec, overlap_duration):
+        """ 
+        Simple한 병합
+
+        :param  data_set: 병합하고 싶은 데이터들의 셋
+        :type intDataInfo: json
+
+        :param  integration_freq_sec: 조정하고 싶은 second 단위의 Frequency
+        :type process_param: json
+            
+        :param  overlap_duration: 조정하고 싶은 second 단위의 Frequency
+        :type overlap_duration: json
+      
+        :return: integrated_data
+        :rtype: DataFrame    
+        """
+        ## Integration
+        from KETIPreDataIntegration.meta_integration import data_integration
+        ## simple integration
+        data_int = data_integration.DataIntegration(data_set)
+        dintegrated_data = data_int.simple_integration(overlap_duration)
+        dintegrated_data = dintegrated_data.resample(integration_freq_sec).mean()
+        
+        return dintegrated_data
+
 
 
 
