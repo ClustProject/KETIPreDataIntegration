@@ -126,7 +126,6 @@ class PartialData():
             x = reduce(gcd, list)
             return x
         frequency_list = frequency['frequency_list']
-        print(frequency_list)
         frequency['GCD'] = find_gcd(frequency_list) #Greatest common divisor
         frequency['GCDs'] = str(int(frequency['GCD']))+'S'
 
@@ -179,7 +178,6 @@ class PartialData():
             freq_sec = (data.index[1] - data.index[0]).total_seconds()
         else:
             freq_sec = pd.to_timedelta(freq, errors='coerce').total_seconds()
-        print(freq_sec)
         return freq_sec
 
     def get_df_freq_timedelta(self, data, freq_check_length):

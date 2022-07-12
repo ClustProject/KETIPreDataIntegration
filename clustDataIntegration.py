@@ -96,7 +96,6 @@ class ClustIntegration():
         partial_data_info = partialDataInfo.PartialData(multiple_dataset)
         
         overlap_duration = partial_data_info.column_meta["overlap_duration"]
-        print(integration_param)
         integration_freq_sec = integration_param["granularity_sec"]
         ## set refine frequency parameter
         if not integration_freq_sec:

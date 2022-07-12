@@ -121,7 +121,6 @@ class DataIntegration():
             column_function[column_name] = sampling_method
 
         # To Do : Upgrade merge function 
-        print(column_function)
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)  
         return reStructuredData 
 
