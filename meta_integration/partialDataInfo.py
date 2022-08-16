@@ -173,18 +173,16 @@ class PartialData():
         return(len(set(item_list))) < 2
 
     def get_df_freq_sec(self, data, freq_check_length):
-
         freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
-        if not freq:
+        if not freq or freq == 'B':
             freq_sec = (data.index[1] - data.index[0]).total_seconds()
         else:
             freq_sec = pd.to_timedelta(freq, errors='coerce').total_seconds()
-        print(freq_sec)
         return freq_sec
 
     def get_df_freq_timedelta(self, data, freq_check_length):
         freq = to_offset(pd.infer_freq(data[:freq_check_length].index))
-        if not freq:
+        if not freq or freq == 'B':
             freq_timedelta= pd.to_timedelta(data.index[1] - data.index[0])
         else:
             freq_timedelta = pd.to_timedelta(freq, errors='coerce')
