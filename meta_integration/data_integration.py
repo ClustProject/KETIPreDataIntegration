@@ -121,7 +121,6 @@ class DataIntegration():
             column_function[column_name] = sampling_method
 
         # To Do : Upgrade merge function 
-        print(column_function)
         reStructuredData = self.merged_data.resample(re_frequency).agg(column_function)  
         return reStructuredData 
 
@@ -184,7 +183,7 @@ class DataIntegration():
             origin_frequency = column_info['column_frequency']
             import math 
             limit_num = math.ceil(origin_frequency/re_frequency)
-
+            print(limit_num)
             if origin_frequency > re_frequency: #upsampling
                 import numpy as np
                 if column_info['column_type'] == np.dtype('O'):

@@ -126,7 +126,6 @@ class PartialData():
             x = reduce(gcd, list)
             return x
         frequency_list = frequency['frequency_list']
-        print(frequency_list)
         frequency['GCD'] = find_gcd(frequency_list) #Greatest common divisor
         frequency['GCDs'] = str(int(frequency['GCD']))+'S'
 
