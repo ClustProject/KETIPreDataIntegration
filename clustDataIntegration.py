@@ -114,7 +114,7 @@ class ClustIntegration():
         if integrationMethod=="meta":
             result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_sec, partial_data_info)
         elif integrationMethod=="ML":
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['transformParam'], overlap_duration)
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'], overlap_duration)
         elif integrationMethod=="simple":
             result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
         else:

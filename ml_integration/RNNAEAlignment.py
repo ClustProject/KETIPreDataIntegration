@@ -34,18 +34,18 @@ class Alignment():
         # NaN 값을 0으로 대치한 데이터를 사용하여 dataloader 구축
         dataset = dataset.fillna(0)
         train_loader, inference_loader = self.get_loaders(data=dataset, window_size=parameter['window_size'], batch_size=parameter['batch_size'])
-        
+        print("모델 학습 시작")
         # 모델 학습
         model = RecurrentAutoencoder(n_features=n_features, embedding_dim=parameter['emb_dim'])
         model, history = train_model(model, train_loader, parameter)
-
+        print("학습 모델 저장")
         # 학습된 모델 저장
         os.makedirs('./checkpoints', exist_ok=True)
         torch.save(model.state_dict(), './checkpoints/best_model.pt')
         
         # 학습된 모델로 각 time window에 대한 새로운 변수 추출
         output = get_representation(model, inference_loader, parameter)
-        
+        print("dataFrame 형태로 변환")
         # 도출된 결과물을 dataFrame 형태로 변환
         data_col = [ f'concat_emb{i}' for i in range(1, parameter['emb_dim'] + 1)]
         data_index = dataset.index[parameter['window_size']:]
