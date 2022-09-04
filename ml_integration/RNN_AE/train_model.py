@@ -29,10 +29,14 @@ def train_model(model, train_dataloader, parameter):
     best_model_wts = copy.deepcopy(model.state_dict())
     best_loss = 10000
     history = []
+    count = 0
     for epoch in range(1, n_epochs + 1):
+        print("epoch : ", epoch)
         model = model.train()
         losses = []
         for x in train_dataloader:
+            count+=1
+            print("train_dataloader count : ", count)
             optimizer.zero_grad()
 
             x = x[0].to(device)
@@ -49,7 +53,7 @@ def train_model(model, train_dataloader, parameter):
         if epoch_loss < best_loss:
             best_loss = epoch_loss
             best_model_wts = copy.deepcopy(model.state_dict())
-
+    print("=======================")
     model.load_state_dict(best_model_wts)
     return model, history
 

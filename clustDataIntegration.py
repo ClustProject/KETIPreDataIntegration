@@ -93,7 +93,8 @@ class ClustIntegration():
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
 
-        partial_data_info = partialDataInfo.PartialData(multiple_dataset)
+        integration_criteria = integration_param["integration_criteria"]
+        partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_criteria)
         
         overlap_duration = partial_data_info.column_meta["overlap_duration"]
         integration_freq_sec = integration_param["granularity_sec"]
