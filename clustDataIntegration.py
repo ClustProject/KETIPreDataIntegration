@@ -12,7 +12,7 @@ class ClustIntegration():
     def __init__(self):
         pass
 
-    def clustIntegrationFromInfluxSource(self, db_client, intDataInfo, process_param, integration_param):
+    def clustIntegrationFromInfluxSource(self, db_client, intDataInfo, process_param, integration_param, dataReadMode=None, dataSet=None):
         """ 
         사용자가 입력한 Parameter에 따라 데이터를 병합하는 함수
         1. intDataInfo 에 따라 InfluxDB로 부터 데이터를 읽어와 DataSet을 생성
@@ -87,14 +87,16 @@ class ClustIntegration():
         """
         ## multiple dataset
         from KETIPreDataIngestion.data_influx import influx_Module
-        multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
-
+        if dataReadMode == "input":
+            multiple_dataset = dataSet
+        else:
+            multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
         
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
 
-        integration_criteria = integration_param["integration_criteria"]
-        partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_criteria)
+        integration_duration_criteria = integration_param["integration_duration_criteria"]
+        partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_duration_criteria)
         
         overlap_duration = partial_data_info.column_meta["overlap_duration"]
         integration_freq_sec = integration_param["granularity_sec"]
