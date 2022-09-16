@@ -95,11 +95,9 @@ class PartialData():
                 column_info['column_type'] = column_type
                 
                 if column_type == np.dtype('O') :
-                    print("ObjectType")
                     column_info['upsampling_method']= "objectUpFunc" 
                     column_info['downsampling_method']= "objectDownFunc"
                 else:
-                    print("IntType")
                     column_info['upsampling_method']="mean" #default
                     column_info['downsampling_method']="mean" #default
                 column_list[column] = column_info
