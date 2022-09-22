@@ -12,7 +12,7 @@ class ClustIntegration():
     def __init__(self):
         pass
 
-    def clustIntegrationFromInfluxSource(self, db_client, intDataInfo, process_param, integration_param, dataReadMode=None, dataSet=None):
+    def clustIntegrationFromInfluxSource(self, db_client, intDataInfo, process_param, integration_param):
         """ 
         사용자가 입력한 Parameter에 따라 데이터를 병합하는 함수
         1. intDataInfo 에 따라 InfluxDB로 부터 데이터를 읽어와 DataSet을 생성
@@ -87,10 +87,103 @@ class ClustIntegration():
         """
         ## multiple dataset
         from KETIPreDataIngestion.data_influx import influx_Module
-        if dataReadMode == "input":
-            multiple_dataset = dataSet
+        multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
+        
+        ## get partialDataInfo
+        from KETIPreDataIntegration.meta_integration import partialDataInfo
+
+        integration_duration_criteria = integration_param["integration_duration_criteria"]
+        partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_duration_criteria)
+        
+        overlap_duration = partial_data_info.column_meta["overlap_duration"]
+        integration_freq_sec = integration_param["granularity_sec"]
+        ## set refine frequency parameter
+        if not integration_freq_sec:
+            process_param["refine_param"]["staticFrequency"]["frequency"] = partial_data_info.partial_frequency_info['GCDs']
+        ## Preprocessing
+        from KETIPrePartialDataPreprocessing import data_preprocessing
+        #process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
+        partialP = data_preprocessing.packagedPartialProcessing(process_param)
+        multiple_dataset = partialP.MultipleDatasetallPartialProcessing(multiple_dataset)
+        ## Integration
+        from KETIPreDataIntegration.meta_integration import data_integration
+        imputed_datas = {}
+        integrationMethod = integration_param['method']
+        for key in multiple_dataset.keys():
+            imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
+        if integrationMethod=="meta":
+            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_sec, partial_data_info)
+        elif integrationMethod=="ML":
+            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'], overlap_duration)
+        elif integrationMethod=="simple":
+            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
         else:
-            multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
+            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
+
+        return result
+    
+    def clustIntegrationFromDataset(self, process_param, integration_param, dataSet):
+        """ 
+        사용자가 입력한 dataSet과 Parameter에 따라 데이터를 병합하는 함수
+        1. 통합을 원하는 dataSet 입력
+        2. 병합에 필요한 partialDataInfo(column characteristics)를 추출
+        3. Refine Frequency 진행
+        4. 입력 method에 따라 ML(transformParam) 혹은 Meta(column characteristics)으로 데이터 병합
+            
+        :param  process_param: Refine Frequency를 하기 위한 Preprocessing Parameter
+        :type process_param: json
+        
+        :param  integration_param: Integration을 위한 method, transformParam이 담긴 Parameter
+        :type integration_param: json
+
+        >>> process_param 
+            refine_param = {
+                "removeDuplication":{"flag":True},
+                "staticFrequency":{"flag":True, "frequency":None}
+            }
+            CertainParam= {'flag': True}
+            uncertainParam= {'flag': False, "param":{
+                    "outlierDetectorConfig":[
+                            {'algorithm': 'IQR', 'percentile':99 ,'alg_parameter': {'weight':100}}    
+            ]}}
+            outlier_param ={
+                "certainErrorToNaN":CertainParam, 
+                "unCertainErrorToNaN":uncertainParam
+            }
+            imputation_param = {
+                "serialImputation":{
+                    "flag":False,
+                    "imputation_method":[{"min":0,"max":3,"method":"linear", "parameter":{}}],
+                    "totalNonNanRatio":80
+                }
+            }
+            process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
+
+        >>> integration_param1 = {
+                "granularity_sec":"",
+                "transformParam":{
+                                "model": 'RNN_AE',
+                                "model_parameter": {
+                                    "window_size": 10, # 모델의 input sequence 길이, int(default: 10, 범위: 0 이상 & 원래 데이터의 sequence 길이 이하)
+                                    "emb_dim": 5, # 변환할 데이터의 차원, int(범위: 16~256)
+                                    "num_epochs": 50, # 학습 epoch 횟수, int(범위: 1 이상, 수렴 여부 확인 후 적합하게 설정)
+                                    "batch_size": 128, # batch 크기, int(범위: 1 이상, 컴퓨터 사양에 적합하게 설정)
+                                    "learning_rate": 0.0001, # learning rate, float(default: 0.0001, 범위: 0.1 이하)
+                                    "device": 'cpu' # 학습 환경, ["cuda", "cpu"] 중 선택
+                                }
+                            },
+                "method":"ML" #["ML", "meta", "simple]
+            }
+        >>> integration_param2 = {
+                "granularity_sec":integration_freq_sec,
+                "param":{},
+                "method":"meta"
+            }
+                
+        :return: integrated_data
+        :rtype: DataFrame    
+        """
+        multiple_dataset = dataSet
         
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
