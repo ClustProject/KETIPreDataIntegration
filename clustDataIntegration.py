@@ -89,40 +89,12 @@ class ClustIntegration():
         from KETIPreDataIngestion.data_influx import influx_Module
         multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
         
-        ## get partialDataInfo
-        from KETIPreDataIntegration.meta_integration import partialDataInfo
-
-        integration_duration_criteria = integration_param["integration_duration_criteria"]
-        partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_duration_criteria)
-        
-        overlap_duration = partial_data_info.column_meta["overlap_duration"]
-        integration_freq_sec = integration_param["granularity_sec"]
-        ## set refine frequency parameter
-        if not integration_freq_sec:
-            process_param["refine_param"]["staticFrequency"]["frequency"] = partial_data_info.partial_frequency_info['GCDs']
-        ## Preprocessing
-        from KETIPrePartialDataPreprocessing import data_preprocessing
-        #process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
-        partialP = data_preprocessing.packagedPartialProcessing(process_param)
-        multiple_dataset = partialP.MultipleDatasetallPartialProcessing(multiple_dataset)
-        ## Integration
-        from KETIPreDataIntegration.meta_integration import data_integration
-        imputed_datas = {}
-        integrationMethod = integration_param['method']
-        for key in multiple_dataset.keys():
-            imputed_datas[key]=(multiple_dataset[key]["imputed_data"])
-        if integrationMethod=="meta":
-            result = self.getIntegratedDataSetByMeta(imputed_datas, integration_freq_sec, partial_data_info)
-        elif integrationMethod=="ML":
-            result = self.getIntegratedDataSetByML(imputed_datas, integration_param['param'], overlap_duration)
-        elif integrationMethod=="simple":
-            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
-        else:
-            result = self.IntegratedDataSetBySimple(imputed_datas, integration_freq_sec, overlap_duration)
+        ## get integrated data
+        result = self.clustIntegrationFromDataset(process_param, integration_param, multiple_dataset)
 
         return result
     
-    def clustIntegrationFromDataset(self, process_param, integration_param, dataSet):
+    def clustIntegrationFromDataset(self, process_param, integration_param, multiple_dataset):
         """ 
         사용자가 입력한 dataSet과 Parameter에 따라 데이터를 병합하는 함수
         1. 통합을 원하는 dataSet 입력
@@ -183,7 +155,7 @@ class ClustIntegration():
         :return: integrated_data
         :rtype: DataFrame    
         """
-        multiple_dataset = dataSet
+        #multiple_dataset = dataSet
         
         ## get partialDataInfo
         from KETIPreDataIntegration.meta_integration import partialDataInfo
