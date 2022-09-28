@@ -50,6 +50,8 @@ def train_model(model, train_dataloader, parameter):
         
         epoch_loss = np.mean(losses)
         history.append(epoch_loss)
+        print("epoch_loss : " , epoch_loss)
+        print("best_loss : ", best_loss)
         if epoch_loss < best_loss:
             best_loss = epoch_loss
             best_model_wts = copy.deepcopy(model.state_dict())
