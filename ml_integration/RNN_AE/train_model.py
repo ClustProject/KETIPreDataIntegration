@@ -55,7 +55,7 @@ def train_model(model, train_dataloader, parameter):
         if epoch_loss < best_loss:
             best_loss = epoch_loss
             best_model_wts = copy.deepcopy(model.state_dict())
-        else:
+        if epoch_loss > 10000:
             print("+++++++++++++++++++")
             print("epoch_loss : " , epoch_loss)
             print("best_loss : ", best_loss)
