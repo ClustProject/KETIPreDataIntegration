@@ -33,7 +33,7 @@ def RNN_AE(dataset, parameter):
 
     # NaN 값을 0으로 대치한 데이터를 사용하여 dataloader 구축
     dataset = dataset.fillna(0)
-    train_loader, inference_loader = get_loaders(data=dataset, window_size=parameter['window_size'], batch_size=parameter['batch_size'])
+    train_loader, inference_loader = get_loaders(data=dataset, window_size=parameter['window_size'], batch_size=parameter['batch_size'], sliding_size=parameter["sliding_size"])
     print("모델 학습 시작")
     # 모델 학습
     model = RecurrentAutoencoder(n_features=n_features, embedding_dim=parameter['emb_dim'])
@@ -52,7 +52,7 @@ def RNN_AE(dataset, parameter):
     output = pd.DataFrame(output, columns=data_col, index=data_index)
     return output
     
-def get_loaders(data, window_size, batch_size):
+def get_loaders(data, window_size, batch_size, sliding_size):
     """
     전체 시계열 데이터를 기반으로 window_size 크기의 time window를 생성하고 이에 대한 dataloader를 구축하는 함수
     
@@ -75,7 +75,7 @@ def get_loaders(data, window_size, batch_size):
 
     # 전체 시계열 데이터를 기반으로 한 시점씩 슬라이딩하면서 window_size 크기의 time window 생성
     windows = []
-    for i in range(len(data) - window_size):
+    for i in range(0, len(data) - window_size + 1, sliding_size):
         window = data[i:i + window_size, :]
         windows.append(window)
 

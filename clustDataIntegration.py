@@ -228,8 +228,6 @@ class ClustIntegration():
         
         model = transform_param["model"]
         transfomrParam = transform_param['model_parameter']
-        if transfomrParam["window_size"] == "inputData Length-1":
-            transfomrParam["window_size"] = len(dintegrated_data) - 1
         if model == "RNN_AE":
             alignment_result = RNNAEAlignment.RNN_AE(dintegrated_data, transfomrParam)
         else :
