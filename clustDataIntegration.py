@@ -3,6 +3,12 @@ import sys
 sys.path.append("../")
 sys.path.append("../..")
 import datetime
+from KETIPreDataIntegration.meta_integration import partialDataInfo
+from KETIPrePartialDataPreprocessing import data_preprocessing
+from KETIPreDataIngestion.data_influx import influx_Module
+from KETIPreDataIntegration.ml_integration import RNNAEAlignment
+from KETIPreDataIntegration.meta_integration import data_integration
+
 # CLUST Project based custom function
 
 class ClustIntegration():
@@ -86,7 +92,6 @@ class ClustIntegration():
         :rtype: DataFrame    
         """
         ## multiple dataset
-        from KETIPreDataIngestion.data_influx import influx_Module
         multiple_dataset  = influx_Module.get_MeasurementDataSetOnlyNumeric(db_client, intDataInfo)
         
         ## get integrated data
@@ -155,11 +160,6 @@ class ClustIntegration():
         :return: integrated_data
         :rtype: DataFrame    
         """
-        #multiple_dataset = dataSet
-        
-        ## get partialDataInfo
-        from KETIPreDataIntegration.meta_integration import partialDataInfo
-
         integration_duration_criteria = integration_param["integration_duration_criteria"]
         partial_data_info = partialDataInfo.PartialData(multiple_dataset, integration_duration_criteria)
         
@@ -169,12 +169,9 @@ class ClustIntegration():
         if not integration_freq_sec:
             process_param["refine_param"]["staticFrequency"]["frequency"] = partial_data_info.partial_frequency_info['GCDs']
         ## Preprocessing
-        from KETIPrePartialDataPreprocessing import data_preprocessing
-        #process_param = {'refine_param':refine_param, 'outlier_param':outlier_param, 'imputation_param':imputation_param}
         partialP = data_preprocessing.packagedPartialProcessing(process_param)
         multiple_dataset = partialP.MultipleDatasetallPartialProcessing(multiple_dataset)
         ## Integration
-        from KETIPreDataIntegration.meta_integration import data_integration
         imputed_datas = {}
         integrationMethod = integration_param['method']
         for key in multiple_dataset.keys():
@@ -219,8 +216,6 @@ class ClustIntegration():
         :return: integrated_data by transform
         :rtype: DataFrame    
         """
-        from KETIPreDataIntegration.ml_integration import RNNAEAlignment
-        from KETIPreDataIntegration.meta_integration import data_integration
         
         ## simple integration
         data_int = data_integration.DataIntegration(data_set)
@@ -252,10 +247,7 @@ class ClustIntegration():
         :rtype: DataFrame    
         """
         ## Integration
-        from KETIPreDataIntegration.meta_integration import data_integration
-        
         data_it = data_integration.DataIntegration(data_set)
-       
         
         re_frequency = datetime.timedelta(seconds= integration_freq_sec)
         integrated_data_resample = data_it.dataIntegrationByMeta(re_frequency, partial_data_info.column_meta)
@@ -278,8 +270,6 @@ class ClustIntegration():
         :return: integrated_data
         :rtype: DataFrame    
         """
-        ## Integration
-        from KETIPreDataIntegration.meta_integration import data_integration
         ## simple integration
         re_frequency = datetime.timedelta(seconds= integration_freq_sec)
         data_int = data_integration.DataIntegration(data_set)
