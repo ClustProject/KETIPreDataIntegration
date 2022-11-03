@@ -3,18 +3,11 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.impute import KNNImputer
-
 import torch
 import torch.nn as nn
-
 from KETIPreDataIntegration.ml_integration.RNN_AE.model import RecurrentAutoencoder
 from KETIPreDataIntegration.ml_integration.RNN_AE.train_model import train_model, get_representation
 
-
-# class Alignment():
-#     def __init__(self):
-#         pass
-   
 def RNN_AE(dataset, parameter):
     """
     RAE 모델을 기반으로 새롭게 도출된 변수로 align 된 데이터를 dataFrame 형태로 반환하는 함수
@@ -75,16 +68,15 @@ def get_loaders(data, window_size, batch_size, sliding_size):
     :rtype: DataLoader
     
     """
-
     # numpy array 형태로 변환
     data = data.values
-
+    
     # 전체 시계열 데이터를 기반으로 한 시점씩 슬라이딩하면서 window_size 크기의 time window 생성
     windows = []
     for i in range(0, len(data) - window_size + 1, sliding_size):
         window = data[i:i + window_size, :]
         windows.append(window)
-
+        
     # 분할된 time window 단위의 데이터를 tensor 형태로 변경하여 데이터셋 및 데이터로더 구축
     dataset = torch.utils.data.TensorDataset(torch.Tensor(np.array(windows)))
     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -106,7 +98,6 @@ def getOverlapData(x1, x2):
     :return: overlap Data with [maximum MinIndex : minimum MaxIndex]
     :rtype: dataFrame
     """
-
     # check each min-max range
     v1_min = x1.index.min()
     v2_min = x2.index.min()
@@ -119,5 +110,6 @@ def getOverlapData(x1, x2):
     # 공통 수집 시간에 해당하는 통합 데이터 도출
     data_concat = pd.concat([x1, x2], axis=1, join='outer')
     data_concat = data_concat.iloc[v_min:v_max + 1, :]
+    
     return data_concat
     
