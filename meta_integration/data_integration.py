@@ -1,5 +1,7 @@
 import pandas as pd 
 import numpy as np
+from collections import Counter
+import math 
 class DataIntegration():
     """
     Data Integration Class
@@ -126,13 +128,11 @@ class DataIntegration():
 
     def converting_sampling_method(self, sampling_method_string):
         def objectDownFunc(x):
-            from collections import Counter
             c = Counter(x)
             mostFrequent = c.most_common(1)
             return mostFrequent[0][0]
 
         def objectUpFunc(x): # TODO Modify
-            from collections import Counter
             c = Counter(x)
             mostFrequent = c.most_common(1)
             if 0< len(mostFrequent):
@@ -181,10 +181,8 @@ class DataIntegration():
             #reStructuredData = data.resample(frequency).apply(np.mean)
             column_info = column_characteristics[column_name]
             origin_frequency = column_info['column_frequency']
-            import math 
             limit_num = math.ceil(origin_frequency/re_frequency)
             if origin_frequency > re_frequency: #upsampling
-                import numpy as np
                 if column_info['column_type'] == np.dtype('O'):
                    reStructuredData[column_name] = reStructuredData[column_name].fillna(method ="ffill", limit = limit_num) 
                 else:

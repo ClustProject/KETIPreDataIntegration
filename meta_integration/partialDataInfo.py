@@ -5,6 +5,8 @@ sys.path.append("../..")
 import pandas as pd
 import numpy as np
 from pandas.tseries.frequencies import to_offset
+from math import gcd
+from functools import reduce
 
 class PartialData():
     def __init__(self, partial_data_set, integration_duration_criteria):
@@ -118,8 +120,7 @@ class PartialData():
         frequency['frequency_is_same'] = self._check_same_freq(partialFreqList)
         frequency['average_frequency'] = np.mean(partialFreqList)
         frequency['median_frequency'] = np.median(partialFreqList)
-        from math import gcd
-        from functools import reduce
+
         def find_gcd(list):
             x = reduce(gcd, list)
             return x
