@@ -9,7 +9,6 @@ class DataIntegration():
     def __init__(self, data_partial):    
         self.data_partial = data_partial
         
-
     def dataIntegrationByMeta(self, re_frequency, column_meta):
         """ 
         1. simple data integration
@@ -109,6 +108,7 @@ class DataIntegration():
         >>> re_frequency = datetime.timedelta(seconds=180)
         >>> integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
         """
+        
         # TODO JW 수정해서 바꿔야함. 우선 스트링 타입에 대해서 이젠 동작하지 않고 있음
         column_function={}
         for column_name in column_characteristics:
@@ -173,7 +173,6 @@ class DataIntegration():
         >>> integrated_data_resample = data_int.restructured_data_with_new_frequency(re_frequency, column_characteristics)
         >>> integrated_data_resample_fillna = data_int.restructured_data_fillna(integrated_data_resample, column_characteristics,re_frequency, fillna_num )
         """
-
         column_function={} 
         
         reStructuredData = origin_data.copy()
