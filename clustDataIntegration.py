@@ -3,11 +3,11 @@ import sys
 sys.path.append("../")
 sys.path.append("../..")
 import datetime
-from KETIPreDataIntegration.meta_integration import partialDataInfo
+from KETIPreDataIntegration.meta import partialDataInfo
 from KETIPrePartialDataPreprocessing import data_preprocessing
 from KETIPreDataIngestion.data_influx import influx_Module
-from KETIPreDataIntegration.ml_integration import RNNAEAlignment
-from KETIPreDataIntegration.meta_integration import data_integration
+from KETIPreDataIntegration.ML import RNNAEAlignment
+from KETIPreDataIntegration.meta import data_integration
 
 # CLUST Project based custom function
 
