@@ -5,7 +5,7 @@ sys.path.append("../..")
 import datetime
 from KETIPreDataIntegration.meta import partialDataInfo
 from Clust.clust.preprocessing import dataPreprocessing
-from KETIPreDataIngestion.data_influx import influx_Module
+from Clust.clust.ingestion.influx import influx_Module
 from KETIPreDataIntegration.ML import RNNAEAlignment
 from KETIPreDataIntegration.meta import data_integration
 
